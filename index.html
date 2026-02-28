@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antigravity JSON 互转</title>
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #2b2b36;
+      --border-color: #6a6a7e;
+      --text-main: #f0f0f5;
+      --text-muted: #a3a3b5;
+      --title-green: #6bf197;
+      --title-pink: #cc4cee;
+      --btn-bg: #dcd3fc;
+      --btn-text: #2f2545;
+      --btn-light: #ffffff;
+      --btn-dark: #7d60c4;
+      --btn-shadow: inset 2px 2px 0 var(--btn-light), inset -3px -3px 0 var(--btn-dark), 0 4px 8px rgba(0, 0, 0, 0.3);
+      --btn-active: #c5b6f0;
+      --btn-active-shadow: inset 3px 3px 0 var(--btn-dark), inset -2px -2px 0 var(--btn-light), 0 0 0 rgba(0, 0, 0, 0);
+      --ok: #6bf197;
+      --warn: #ffb86c;
+      --bad: #ff5555;
+      --mono: "VT323", "Courier New", Courier, monospace, "SimHei";
+      --sans: "VT323", "SimHei", "Microsoft YaHei", sans-serif;
+      --title-font: "Press Start 2P", "VT323", "SimHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text-main);
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .top-icon {
+      margin-bottom: -10px;
+    }
+
+    .refresh-icon {
+      width: 32px;
+      height: 32px;
+      color: #fff;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--title-green);
+      text-shadow: 3px 3px 0 var(--title-pink);
+      font-family: var(--title-font);
+      text-transform: uppercase;
+      margin: 10px 0 20px 0;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      width: 100%;
+    }
+
+    .card-hd {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-bd {
+      padding: 20px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.15);
+      transition: background 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+    }
+
+    .dropzone:hover {
+      border-color: var(--title-green);
+      background: rgba(107, 241, 151, 0.05);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--title-pink);
+      background: rgba(204, 76, 238, 0.1);
+    }
+
+    .dz-icon {
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+      transition: transform 0.2s;
+    }
+
+    .dropzone:hover .dz-icon {
+      transform: translateY(-4px);
+    }
+
+    .dz-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .dz-sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    .pixel-btn,
+    .btn.primary,
+    .btn.solid-dark {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: var(--btn-shadow);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .pixel-btn:hover,
+    .btn.primary:hover,
+    .btn.solid-dark:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .pixel-btn:active,
+    .btn.primary:active,
+    .btn.solid-dark:active {
+      background: var(--btn-active);
+      box-shadow: var(--btn-active-shadow);
+      transform: translateY(2px);
+    }
+
+    .pixel-btn:disabled,
+    .btn.primary:disabled,
+    .btn.solid-dark:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(1);
+      box-shadow: inset 2px 2px 0 #999, inset -3px -3px 0 #444;
+    }
+
+    .pixel-btn:disabled:active,
+    .btn.primary:disabled:active,
+    .btn.solid-dark:disabled:active {
+      transform: none;
+      box-shadow: inset 2px 2px 0 #999, inset -3px -3px 0 #444;
+    }
+
+    .meta-row {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill,
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .badge.ok {
+      color: var(--ok);
+      border-color: var(--ok);
+      background: rgba(107, 241, 151, 0.1);
+    }
+
+    .badge.warn {
+      color: var(--warn);
+      border-color: var(--warn);
+      background: rgba(255, 184, 108, 0.1);
+    }
+
+    .badge.bad {
+      color: var(--bad);
+      border-color: var(--bad);
+      background: rgba(255, 85, 85, 0.1);
+    }
+
+    .list {
+      margin-top: 16px;
+      border: 1px dashed var(--border-color);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .item {
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .item.expanded {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--title-green);
+    }
+
+    .item-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .item-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .item-title svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--title-pink);
+      transition: transform 0.2s;
+    }
+
+    .item.expanded .item-title svg {
+      transform: rotate(90deg);
+      color: var(--title-green);
+    }
+
+    .item-meta {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .tag.dark {
+      background: #000;
+      color: #fff;
+    }
+
+    .item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      background: var(--bg-color);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn:active {
+      background: #000;
+    }
+
+    .btn.ghost {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .btn.ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-color);
+    }
+
+    .btn.mini {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .item-body {
+      padding: 0 20px 20px;
+      display: none;
+    }
+
+    .item.expanded .item-body {
+      display: block;
+    }
+
+    .pre {
+      margin: 0;
+      padding: 12px;
+      background: #000;
+      color: var(--title-green);
+      border: 1px solid var(--border-color);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: auto;
+      max-height: 400px;
+    }
+
+    .pre::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .banner {
+      margin-bottom: 24px;
+      padding: 16px;
+      border: 1px solid var(--warn);
+      background: rgba(255, 184, 108, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .banner-title {
+      font-weight: bold;
+      color: var(--warn);
+      font-size: 14px;
+    }
+
+    .banner-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .note {
+      margin: 16px 0;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 2px solid var(--border-color);
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .note.warn {
+      border-color: var(--title-pink);
+      color: #fff;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal {
+      width: min(600px, 92vw);
+      border: 2px solid var(--border-color);
+      background: var(--bg-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-hd {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--title-green);
+    }
+
+    .modal-bd {
+      padding: 16px;
+    }
+
+    .textarea {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      padding: 12px;
+      background: #000;
+      border: 1px solid var(--border-color);
+      color: var(--title-green);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .textarea:focus {
+      outline: none;
+      border-color: var(--title-pink);
+      box-shadow: 0 0 10px rgba(204, 76, 238, 0.3);
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="top-icon">
+        <svg viewBox="0 0 24 24" fill="none" class="refresh-icon" stroke="currentColor" stroke-width="3"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </div>
+      <div class="brand">
+        <div class="title">antigravity tools ⇄ cliproxyapi</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card drop-card" aria-label="导入">
+        <div class="card-bd">
+          <input id="fileInput" type="file" accept=".json,application/json" multiple hidden />
+
+          <div id="dropzone" class="dropzone pixel-dropzone" role="button" tabindex="0" aria-label="拖拽或点击导入 JSON">
+            <div class="dz-icon" aria-hidden="true">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 16H24L32 24H56V48H8V16Z" fill="#a890e8" />
+                <path d="M32 24H56V48H32V24Z" fill="#7d60c4" />
+                <path d="M12 28H52V48H12V28Z" fill="#d0bfff" />
+                <rect x="8" y="16" width="16" height="8" fill="#a890e8" />
+              </svg>
+            </div>
+            <div class="dz-title">拖拽 JSON 文件到这里</div>
+            <div class="dz-sub">或点击选择文件 (支持批量)</div>
+            <div class="dz-actions">
+              <button id="pickBtn" class="btn primary" type="button" style="display:none">选择文件</button>
+              <button id="pasteBtn" class="btn" type="button" style="display:none">粘贴 JSON</button>
+            </div>
+          </div>
+
+          <div class="meta-row" style="display:none">
+            <span id="countPill" class="pill">0 个文件</span>
+            <span id="formatPill" class="pill">未解析</span>
+            <button id="clearBtn" class="btn ghost mini" type="button">清空列表</button>
+            <span id="statusBadge" class="badge">就绪</span>
+          </div>
+
+          <div id="importNote" class="note" style="display: none"></div>
+        </div>
+      </section>
+
+      <section class="card results-card" aria-label="转换与下载">
+        <div class="card-hd">
+          <div class="card-title" id="resultsTitle">转换结果</div>
+          <div class="row">
+            <button id="downloadZipBtn" class="pixel-btn" type="button" disabled
+              style="padding: 6px 12px; font-size: 13px;">下载压缩包</button>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div id="repairBanner" class="banner" style="display: none" role="status" aria-live="polite">
+            <div class="banner-main">
+              <div class="banner-title">网络自动修复已开启</div>
+              <div class="banner-sub">
+                尝试获取补全所需的数据。
+              </div>
+            </div>
+            <button id="repairNowBtn" class="btn primary" type="button">立刻重试</button>
+          </div>
+
+          <div id="outputList" class="list" aria-label="输出文件列表"></div>
+
+          <div id="actionNote" class="note" style="display: none"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop" style="display: none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="对话框">
+      <div class="modal-hd">
+        <div id="modalTitle" class="modal-title">—</div>
+        <button id="modalCloseBtn" class="icon-btn" type="button" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M6 6l12 12" />
+            <path d="M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-bd">
+        <div id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const $ = (sel) => document.querySelector(sel);
+
+      const el = {
+        statusBadge: $("#statusBadge"),
+        clearBtn: $("#clearBtn"),
+        fileInput: $("#fileInput"),
+        dropzone: $("#dropzone"),
+        pickBtn: $("#pickBtn"),
+        pasteBtn: $("#pasteBtn"),
+        countPill: $("#countPill"),
+        formatPill: $("#formatPill"),
+        importNote: $("#importNote"),
+        repairBanner: $("#repairBanner"),
+        repairNowBtn: $("#repairNowBtn"),
+        outputList: $("#outputList"),
+        downloadZipBtn: $("#downloadZipBtn"),
+        actionNote: $("#actionNote"),
+        resultsTitle: $("#resultsTitle"),
+        modalBackdrop: $("#modalBackdrop"),
+        modalTitle: $("#modalTitle"),
+        modalBody: $("#modalBody"),
+        modalCloseBtn: $("#modalCloseBtn"),
+      };
+
+      const FORMAT = { TOOLS: "antigravity_tools", CPA: "cliproxyapi", UNKNOWN: "unknown" };
+      const OUT_STATUS = { READY: "ready", PENDING: "pending", ERROR: "error" };
+
+      const OAUTH = {
+        CLIENT_ID: ["1071006060591", "tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"].join("-"),
+        CLIENT_SECRET: ["GOCSPX", "K58FWR486LdLJ1mLB8sXC4z6qDAf"].join("-"),
+        TOKEN_URL: "https://oauth2.googleapis.com/token",
+      };
+
+      const state = {
+        inputs: [],
+        outputs: [],
+        expandedIds: new Set(),
+        repairing: false,
+        repairAbort: null,
+        resolverCache: new Map(),
+      };
+
+      function setStatus(kind, text) {
+        el.statusBadge.textContent = text;
+        el.statusBadge.className = "badge " + (kind === "ok" ? "ok" : kind === "warn" ? "warn" : kind === "bad" ? "bad" : "");
+      }
+
+      function setNote(node, kind, text) {
+        if (!node) return;
+        const t = String(text || "").trim();
+        if (!t) { node.style.display = "none"; node.textContent = ""; node.className = "note"; return; }
+        node.style.display = "";
+        node.textContent = t;
+        node.className = "note" + (kind ? " " + kind : "");
+      }
+
+      function todayYmd() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      function isPlainObject(v) { return typeof v === "object" && v !== null && !Array.isArray(v); }
+
+      function detectFormat(obj) {
+        if (!isPlainObject(obj)) return FORMAT.UNKNOWN;
+        const has = (k) => Object.prototype.hasOwnProperty.call(obj, k);
+        const clipHints = ["access_token", "expires_in", "expired", "timestamp", "project_id", "project", "type"];
+        if (clipHints.some(has)) return FORMAT.CPA;
+        if (has("email") && has("refresh_token")) return FORMAT.TOOLS;
+        return FORMAT.UNKNOWN;
+      }
+
+      function sanitizeFilename(name) {
+        return (String(name || "").trim().replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").replace(/[\s.]+$/g, "")) || "output";
+      }
+
+      function jsonStringifyPretty(obj) { return JSON.stringify(obj, null, 2); }
+
+      function maskSecretsDeep(obj) {
+        const SECRET_KEYS = new Set(["refresh_token", "access_token"]);
+        const seen = new WeakMap();
+        const mask = (s) => { const str = String(s); return str.length <= 10 ? "***" : str.slice(0, 6) + "…" + str.slice(-4); };
+        const clone = (v) => {
+          if (v == null) return v;
+          if (typeof v !== "object") return v;
+          if (seen.has(v)) return seen.get(v);
+          if (Array.isArray(v)) { const arr = []; seen.set(v, arr); for (let i = 0; i < v.length; i++) arr[i] = clone(v[i]); return arr; }
+          const out = {}; seen.set(v, out);
+          for (const [k, val] of Object.entries(v)) { out[k] = SECRET_KEYS.has(k) && typeof val === "string" ? mask(val) : clone(val); }
+          return out;
+        };
+        return clone(obj);
+      }
+
+      function newId() {
+        return typeof crypto !== "undefined" && crypto && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID() : "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+      }
+
+      function flattenParsed(parsed, sourceLabel) {
+        if (Array.isArray(parsed)) {
+          const items = [];
+          parsed.forEach((v, idx) => { if (!isPlainObject(v)) throw new Error(`数组第 ${idx + 1} 项不是对象`); items.push({ obj: v, source: sourceLabel }); });
+          return items;
+        }
+        if (isPlainObject(parsed)) return [{ obj: parsed, source: sourceLabel }];
+        throw new Error("只支持 JSON 对象或数组");
+      }
+
+      function summarizeFormats() {
+        const counts = { [FORMAT.TOOLS]: 0, [FORMAT.CPA]: 0, [FORMAT.UNKNOWN]: 0 };
+        for (const r of state.inputs) counts[r.format] = (counts[r.format] || 0) + 1;
+        const parts = [];
+        if (counts[FORMAT.TOOLS]) parts.push(`antigravity tools × ${counts[FORMAT.TOOLS]}`);
+        if (counts[FORMAT.CPA]) parts.push(`cliproxyapi × ${counts[FORMAT.CPA]}`);
+        if (counts[FORMAT.UNKNOWN]) parts.push(`unknown × ${counts[FORMAT.UNKNOWN]}`);
+        return parts.length ? parts.join(" · ") : "未导入";
+      }
+
+      function validateEmailRefresh(obj) {
+        const email = obj?.email, refresh = obj?.refresh_token;
+        if (typeof email !== "string" || email.trim() === "") return { ok: false, error: "缺少或无效 email" };
+        if (typeof refresh !== "string" || refresh.trim() === "") return { ok: false, error: "缺少或无效 refresh_token" };
+        return { ok: true };
+      }
+
+      function downloadBlob(blob, filename) {
+        const a = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+      }
+
+      function abortRepairs() {
+        if (state.repairAbort) { try { state.repairAbort.abort(); } catch { } }
+        state.repairAbort = null; state.repairing = false;
+      }
+
+      function clearAll() {
+        abortRepairs();
+        state.inputs = []; state.outputs = [];
+        state.expandedIds.clear(); state.resolverCache.clear();
+        setNote(el.importNote, "", ""); setNote(el.actionNote, "", "");
+        setStatus("ok", "已清空"); renderAll();
+      }
+
+      function addInputs(items) {
+        const added = [];
+        for (const it of items) {
+          const id = newId(), fmt = detectFormat(it.obj);
+          const email = typeof it.obj?.email === "string" ? it.obj.email.trim() : "";
+          const refresh_token = typeof it.obj?.refresh_token === "string" ? it.obj.refresh_token.trim() : "";
+          const v = validateEmailRefresh(it.obj);
+          const valid = fmt !== FORMAT.UNKNOWN && v.ok;
+          added.push({
+            id, source: it.source, obj: it.obj, format: fmt, email, refresh_token, valid,
+            error: fmt === FORMAT.UNKNOWN ? "无法识别格式（缺少关键字段）" : v.ok ? "" : v.error
+          });
+        }
+        state.inputs = state.inputs.concat(added);
+        rebuildOutputs();
+        setStatus("ok", `已导入 ${added.length} 条`);
+      }
+
+      async function handleFiles(fileList) {
+        const files = Array.from(fileList || []);
+        if (!files.length) return;
+        abortRepairs(); setStatus("", "正在导入...");
+        setNote(el.importNote, "", ""); setNote(el.actionNote, "", "");
+        const items = [], errors = [];
+        for (const f of files) {
+          try { const text = await f.text(); const parsed = JSON.parse(text); flattenParsed(parsed, f.name).forEach(x => items.push(x)); }
+          catch (e) { errors.push(`${f.name}：${e?.message || "解析失败"}`); }
+        }
+        if (errors.length) setNote(el.importNote, "warn", "部分文件导入失败：\n" + errors.join("\n"));
+        if (items.length) addInputs(items);
+        else { renderAll(); setStatus("bad", "导入失败"); }
+      }
+
+      function buildToolsOutput(inputs) {
+        const seen = new Set(), accounts = [];
+        for (const r of inputs) {
+          if (!r.valid || !r.email || !r.refresh_token) continue;
+          const key = r.email.toLowerCase();
+          if (seen.has(key)) continue; seen.add(key);
+          accounts.push({ email: r.email, refresh_token: r.refresh_token });
+        }
+        return accounts;
+      }
+
+      function buildCpaSkeletonFromToolsInput(r) {
+        return {
+          access_token: "", email: r.email, expired: "", expires_in: 3599,
+          refresh_token: r.refresh_token, timestamp: Date.now(), type: "antigravity", project_id: "", project: ""
+        };
+      }
+
+      function needsNetworkRepairForToolsToCpa(obj) {
+        const pid = typeof obj?.project_id === "string" ? obj.project_id.trim() : typeof obj?.project === "string" ? obj.project.trim() : "";
+        const at = typeof obj?.access_token === "string" ? obj.access_token.trim() : "";
+        return !pid || !at;
+      }
+
+      function normalizeCpaRecord(obj, fallback) {
+        const email = typeof obj?.email === "string" && obj.email.trim() ? obj.email.trim() : fallback?.email || "";
+        const refresh_token = typeof obj?.refresh_token === "string" && obj.refresh_token.trim() ? obj.refresh_token.trim() : fallback?.refresh_token || "";
+        const access_token = typeof obj?.access_token === "string" ? obj.access_token : "";
+        const expires_in = typeof obj?.expires_in === "number" && Number.isFinite(obj.expires_in) && obj.expires_in > 0 ? Math.floor(obj.expires_in) : 3599;
+        const timestamp = typeof obj?.timestamp === "number" && Number.isFinite(obj.timestamp) ? Math.floor(obj.timestamp) : Date.now();
+        const pid = typeof obj?.project_id === "string" && obj.project_id.trim() ? obj.project_id.trim() : typeof obj?.project === "string" ? obj.project.trim() : "";
+        const expired = typeof obj?.expired === "string" && obj.expired.trim() ? obj.expired.trim() : new Date(timestamp + expires_in * 1000).toISOString();
+        return {
+          access_token, email, expired, expires_in, refresh_token, timestamp,
+          type: typeof obj?.type === "string" && obj.type.trim() ? obj.type.trim() : "antigravity", project_id: pid, project: pid
+        };
+      }
+
+      function rebuildOutputs() {
+        const prevExpanded = new Set(state.expandedIds);
+        const valid = state.inputs.filter(r => r.valid);
+        const toolsInputs = valid.filter(r => r.format === FORMAT.TOOLS);
+        const cpaInputs = valid.filter(r => r.format === FORMAT.CPA);
+        const outputs = [];
+
+        if (cpaInputs.length) {
+          const accounts = buildToolsOutput(cpaInputs);
+          if (accounts.length) {
+            outputs.push({
+              id: newId(), name: `antigravity_accounts_${todayYmd()}.json`, format: FORMAT.TOOLS,
+              status: OUT_STATUS.READY, obj: accounts, error: "", meta: { count: accounts.length }
+            });
+          }
+        }
+
+        for (const r of toolsInputs) {
+          const fileName = `antigravity-${sanitizeFilename(r.email || "unknown")}.json`;
+          const needRepair = needsNetworkRepairForToolsToCpa(r.obj);
+          outputs.push({
+            id: `cpa_${r.id}`, name: fileName, format: FORMAT.CPA,
+            status: needRepair ? OUT_STATUS.PENDING : OUT_STATUS.READY,
+            obj: needRepair ? buildCpaSkeletonFromToolsInput(r) : normalizeCpaRecord(r.obj, r),
+            error: "", meta: { inputId: r.id, email: r.email }
+          });
+        }
+
+        state.outputs = outputs;
+        state.expandedIds.clear();
+        for (const o of outputs) { if (prevExpanded.has(o.id)) state.expandedIds.add(o.id); }
+
+        const invalidMsgs = state.inputs.filter(r => !r.valid).map(r => `${r.source || "未知来源"}：${r.error || "无效"}`);
+        if (invalidMsgs.length) setNote(el.importNote, "warn", "存在无法识别/无效条目：\n" + invalidMsgs.slice(0, 10).join("\n"));
+        else setNote(el.importNote, "", "");
+
+        renderAll();
+        const pendingCpa = state.outputs.filter(o => o.format === FORMAT.CPA && o.status === OUT_STATUS.PENDING);
+        if (pendingCpa.length) void startRepairPending();
+      }
+
+      function renderCounts() {
+        el.countPill.textContent = `${state.inputs.length} 个文件`;
+        el.formatPill.textContent = summarizeFormats() || "未解析";
+      }
+
+      function renderRepairBanner() { el.repairBanner.style.display = "none"; }
+
+      function renderOutputList() {
+        el.outputList.innerHTML = "";
+        if (!state.outputs.length) {
+          const empty = document.createElement("div"); empty.className = "note";
+          empty.textContent = "暂无输出。请先导入 antigravity tools 或 cliproxyapi 的 JSON。";
+          el.outputList.appendChild(empty); return;
+        }
+        el.resultsTitle.textContent = `转换结果 (${state.outputs.length} 个文件)`;
+        const frag = document.createDocumentFragment();
+        state.outputs.forEach((o, idx) => {
+          const isExpanded = state.expandedIds.has(o.id);
+          const item = document.createElement("div");
+          item.className = "item" + (isExpanded ? " expanded" : "");
+          item.style.setProperty("--delay", String(Math.min(idx * 18, 140)) + "ms");
+          const header = document.createElement("div"); header.className = "item-header";
+          header.addEventListener("click", () => { if (state.expandedIds.has(o.id)) state.expandedIds.delete(o.id); else state.expandedIds.add(o.id); renderAll(); });
+          const main = document.createElement("div"); main.className = "item-main";
+          const title = document.createElement("div"); title.className = "item-title";
+          const sourceStr = o.source ? `${o.source} &rarr; ` : "";
+          title.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg> ${sourceStr}${o.name}`;
+          const meta = document.createElement("div"); meta.className = "item-meta";
+          const fmt = document.createElement("span"); fmt.className = "tag dark"; fmt.textContent = o.format === FORMAT.CPA ? "CPA 格式" : "Tools 格式";
+          const st = document.createElement("span");
+          const stKind = o.status === OUT_STATUS.READY ? "ok" : o.status === OUT_STATUS.PENDING ? "warn" : "bad";
+          st.className = "badge " + stKind;
+          st.textContent = o.status === OUT_STATUS.READY ? "就绪" : o.status === OUT_STATUS.PENDING ? "等待同步" : "错误";
+          meta.appendChild(fmt); meta.appendChild(st);
+          if (o.format === FORMAT.TOOLS && o.meta?.count != null) { const c = document.createElement("span"); c.className = "tag"; c.textContent = `${o.meta.count} 个账号`; meta.appendChild(c); }
+          if (o.format === FORMAT.CPA && o.meta?.email) { const e = document.createElement("span"); e.className = "tag"; e.textContent = o.meta.email; meta.appendChild(e); }
+          main.appendChild(title); main.appendChild(meta);
+          const actions = document.createElement("div"); actions.className = "item-actions";
+          const copyBtn = document.createElement("button"); copyBtn.className = "btn ghost mini"; copyBtn.type = "button";
+          copyBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> 复制`;
+          copyBtn.disabled = o.status !== OUT_STATUS.READY;
+          copyBtn.addEventListener("click", (ev) => { ev.stopPropagation(); onCopyItem(o); });
+          const dl = document.createElement("button"); dl.className = "btn mini"; dl.type = "button";
+          dl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 下载`;
+          dl.disabled = o.status !== OUT_STATUS.READY;
+          dl.addEventListener("click", (ev) => { ev.stopPropagation(); downloadOneOutput(o); });
+          actions.appendChild(copyBtn); actions.appendChild(dl);
+          header.appendChild(main); header.appendChild(actions); item.appendChild(header);
+          if (isExpanded) {
+            const body = document.createElement("div"); body.className = "item-body";
+            const pre = document.createElement("pre"); pre.className = "pre";
+            if (o.status === OUT_STATUS.READY) pre.textContent = jsonStringifyPretty(maskSecretsDeep(o.obj));
+            else if (o.status === OUT_STATUS.PENDING) pre.textContent = "等待自动修复 (联网获取 access_token / project_id)…";
+            else pre.textContent = o.error || "转换失败";
+            body.appendChild(pre); item.appendChild(body);
+          }
+          frag.appendChild(item);
+        });
+        el.outputList.appendChild(frag);
+      }
+
+      function renderGlobalButtons() {
+        const ready = state.outputs.filter(o => o.status === OUT_STATUS.READY);
+        const errors = state.outputs.filter(o => o.status === OUT_STATUS.ERROR);
+        el.downloadZipBtn.disabled = ready.length === 0;
+        if (errors.length) {
+          const msg = errors.map(o => `${o.meta?.email || o.name}：${o.error || "失败"}`).join("\n");
+          setNote(el.actionNote, "warn", `有 ${errors.length} 条转换失败：\n` + msg);
+        } else { setNote(el.actionNote, "", ""); }
+      }
+
+      function renderAll() { renderCounts(); renderRepairBanner(); renderOutputList(); renderGlobalButtons(); }
+
+      function downloadOneOutput(o) {
+        if (!o || o.status !== OUT_STATUS.READY) return;
+        downloadBlob(new Blob([jsonStringifyPretty(o.obj)], { type: "application/json" }), sanitizeFilename(o.name));
+        setStatus("ok", "已下载");
+      }
+
+      async function onCopyItem(o) {
+        if (!o || o.status !== OUT_STATUS.READY) return;
+        const text = jsonStringifyPretty(o.obj);
+        try { await navigator.clipboard.writeText(text); setStatus("ok", "已复制"); }
+        catch { try { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); setStatus("ok", "已复制"); } catch { setStatus("bad", "复制失败"); } }
+      }
+
+      async function onDownloadZip() {
+        const ready = state.outputs.filter(o => o.status === OUT_STATUS.READY);
+        if (!ready.length) return;
+        const encoder = new TextEncoder();
+        const entries = ready.map(o => ({ name: sanitizeFilename(o.name), dataU8: encoder.encode(jsonStringifyPretty(o.obj)), mtime: new Date() }));
+        const zipU8 = makeZip(entries);
+        const ymd = todayYmd();
+        const formats = new Set(ready.map(o => o.format));
+        const zipName = formats.size === 1 ? (formats.has(FORMAT.CPA) ? `cliproxyapi_${ymd}.zip` : `antigravity_tools_${ymd}.zip`) : `converted_${ymd}.zip`;
+        downloadBlob(new Blob([zipU8], { type: "application/zip" }), zipName);
+        setStatus("ok", "已下载 ZIP");
+      }
+
+      function crc32Table() { const t = new Uint32Array(256); for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[i] = c >>> 0; } return t; }
+      const CRC_TABLE = crc32Table();
+      function crc32(u8) { let c = 0xffffffff; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+      function u16LE(n) { return new Uint8Array([n & 0xff, (n >>> 8) & 0xff]); }
+      function u32LE(n) { return new Uint8Array([n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff]); }
+      function concatU8(chunks) { const total = chunks.reduce((s, c) => s + c.length, 0); const out = new Uint8Array(total); let off = 0; for (const c of chunks) { out.set(c, off); off += c.length; } return out; }
+      function dateToDos(date) {
+        const d = date instanceof Date ? date : new Date(); let year = d.getFullYear(); if (year < 1980) year = 1980;
+        const dosTime = ((d.getHours() & 0x1f) << 11) | ((d.getMinutes() & 0x3f) << 5) | (Math.floor(d.getSeconds() / 2) & 0x1f);
+        const dosDate = (((year - 1980) & 0x7f) << 9) | (((d.getMonth() + 1) & 0x0f) << 5) | (d.getDate() & 0x1f);
+        return { dosTime, dosDate };
+      }
+      function makeZip(entries) {
+        const encoder = new TextEncoder(), fileParts = [], centralParts = []; let offset = 0;
+        for (const e of entries) {
+          const nameBytes = encoder.encode(e.name), data = e.dataU8, crc = crc32(data), { dosTime, dosDate } = dateToDos(e.mtime);
+          const lh = concatU8([u32LE(0x04034b50), u16LE(20), u16LE(0), u16LE(0), u16LE(dosTime), u16LE(dosDate), u32LE(crc), u32LE(data.length), u32LE(data.length), u16LE(nameBytes.length), u16LE(0), nameBytes]);
+          fileParts.push(lh, data);
+          const ch = concatU8([u32LE(0x02014b50), u16LE(20), u16LE(20), u16LE(0), u16LE(0), u16LE(dosTime), u16LE(dosDate), u32LE(crc), u32LE(data.length), u32LE(data.length), u16LE(nameBytes.length), u16LE(0), u16LE(0), u16LE(0), u16LE(0), u32LE(0), u32LE(offset), nameBytes]);
+          centralParts.push(ch); offset += lh.length + data.length;
+        }
+        const cd = concatU8(centralParts), n = entries.length;
+        const eocd = concatU8([u32LE(0x06054b50), u16LE(0), u16LE(0), u16LE(n), u16LE(n), u32LE(cd.length), u32LE(offset), u16LE(0)]);
+        return concatU8([...fileParts, cd, eocd]);
+      }
+
+      function isModalOpen() { return el.modalBackdrop.getAttribute("aria-hidden") === "false"; }
+      function openModal(titleText, bodyNode) { el.modalTitle.textContent = titleText; el.modalBody.innerHTML = ""; el.modalBody.appendChild(bodyNode); el.modalBackdrop.style.display = ""; el.modalBackdrop.setAttribute("aria-hidden", "false"); }
+      function closeModal() { el.modalBackdrop.style.display = "none"; el.modalBackdrop.setAttribute("aria-hidden", "true"); el.modalBody.innerHTML = ""; }
+
+      function showPasteModal() {
+        const wrap = document.createElement("div");
+        const ta = document.createElement("textarea"); ta.className = "textarea mono"; ta.placeholder = "粘贴 JSON 对象或数组（antigravity tools / cliproxyapi）";
+        const note = document.createElement("div"); note.className = "note"; note.style.display = "none";
+        const row = document.createElement("div"); row.className = "row"; row.style.marginTop = "12px";
+        const importBtn = document.createElement("button"); importBtn.className = "btn primary"; importBtn.type = "button"; importBtn.textContent = "导入";
+        const cancelBtn = document.createElement("button"); cancelBtn.className = "btn"; cancelBtn.type = "button"; cancelBtn.textContent = "取消";
+        const doImport = () => { try { const parsed = JSON.parse(ta.value || ""); addInputs(flattenParsed(parsed, "粘贴输入")); closeModal(); } catch (e) { note.style.display = ""; note.textContent = e?.message || "解析失败"; } };
+        importBtn.addEventListener("click", doImport);
+        cancelBtn.addEventListener("click", closeModal);
+        ta.addEventListener("keydown", (ev) => { if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") doImport(); });
+        wrap.appendChild(ta); wrap.appendChild(row); row.appendChild(importBtn); row.appendChild(cancelBtn); wrap.appendChild(note);
+        openModal("粘贴 JSON", wrap);
+        setTimeout(() => ta.focus(), 30);
+      }
+
+      function normalizeFetchError(e) {
+        const msg = e?.message ? String(e.message) : String(e || "");
+        return /Failed to fetch/i.test(msg) ? "网络请求失败（可能是浏览器跨域限制或网络被拦截）" : msg || "网络请求失败";
+      }
+
+      function mergeAbortSignals(signals) {
+        const controller = new AbortController();
+        const onAbort = () => { try { controller.abort(); } catch { } };
+        for (const s of signals) { if (!s) continue; if (s.aborted) { onAbort(); break; } try { s.addEventListener("abort", onAbort, { once: true }); } catch { } }
+        return controller.signal;
+      }
+
+      async function fetchTextWithTimeout(url, options, timeoutMs, parentSignal) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => { try { controller.abort(); } catch { } }, timeoutMs);
+        const signal = mergeAbortSignals([controller.signal, parentSignal]);
+        try { const resp = await fetch(url, { ...options, signal }); const text = await resp.text(); return { resp, text }; }
+        catch (e) { throw new Error(normalizeFetchError(e)); }
+        finally { clearTimeout(timer); }
+      }
+
+      async function oauthRefreshAccessToken(refreshToken, parentSignal) {
+        const form = new URLSearchParams();
+        form.set("client_id", OAUTH.CLIENT_ID); form.set("client_secret", OAUTH.CLIENT_SECRET);
+        form.set("grant_type", "refresh_token"); form.set("refresh_token", refreshToken);
+        const { resp, text } = await fetchTextWithTimeout(OAUTH.TOKEN_URL, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: form.toString() }, 20000, parentSignal);
+        let json = {}; try { json = JSON.parse(text); } catch { }
+        if (!resp.ok) throw new Error(`刷新 access_token 失败：${json?.error_description || json?.error || text || `HTTP ${resp.status}`}`);
+        if (!json?.access_token) throw new Error("刷新 access_token 失败：响应缺少 access_token");
+        return { access_token: json.access_token, expires_in: Number(json.expires_in || 0) || 0 };
+      }
+
+      async function fetchCompanionProjectId(accessToken, parentSignal) {
+        const { resp, text } = await fetchTextWithTimeout("https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
+          { method: "POST", headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/json" }, body: JSON.stringify({ metadata: { ideType: "IDE_UNSPECIFIED", platform: "PLATFORM_UNSPECIFIED", pluginType: "GEMINI" } }) }, 20000, parentSignal);
+        let json = {}; try { json = JSON.parse(text); } catch { }
+        if (!resp.ok) throw new Error(`loadCodeAssist 获取 project_id 失败：${json?.error?.message || text || `HTTP ${resp.status}`}`);
+        const project = json?.cloudaicompanionProject;
+        if (typeof project === "string" && project.trim()) return project.trim();
+        if (project && typeof project === "object" && typeof project.id === "string" && project.id.trim()) return project.id.trim();
+        throw new Error("loadCodeAssist 获取 project_id 失败：响应缺少 cloudaicompanionProject");
+      }
+
+      async function fetchFirstProjectId(accessToken, parentSignal) {
+        try {
+          const { resp, text } = await fetchTextWithTimeout("https://cloudresourcemanager.googleapis.com/v3/projects:search",
+            { method: "POST", headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/json" }, body: JSON.stringify({}) }, 20000, parentSignal);
+          let json = {}; try { json = JSON.parse(text); } catch { }
+          if (resp.ok) {
+            const projects = Array.isArray(json?.projects) ? json.projects : [];
+            const any = projects.find(p => p?.state === "ACTIVE" && p.projectId) || projects.find(p => p?.projectId);
+            if (any?.projectId) return String(any.projectId);
+          }
+        } catch { }
+        let pageToken = "";
+        for (let i = 0; i < 10; i++) {
+          const url = new URL("https://cloudresourcemanager.googleapis.com/v1/projects");
+          if (pageToken) url.searchParams.set("pageToken", pageToken);
+          const { resp, text } = await fetchTextWithTimeout(url.toString(), { method: "GET", headers: { authorization: `Bearer ${accessToken}` } }, 20000, parentSignal);
+          let json = {}; try { json = JSON.parse(text); } catch { }
+          if (!resp.ok) throw new Error(`查询 project_id 失败：${json?.error?.message || text || `HTTP ${resp.status}`}`);
+          const projects = Array.isArray(json?.projects) ? json.projects : [];
+          const any = projects.find(p => p?.lifecycleState === "ACTIVE" && p.projectId) || projects.find(p => p?.projectId);
+          if (any?.projectId) return String(any.projectId);
+          pageToken = String(json?.nextPageToken || ""); if (!pageToken) break;
+        }
+        throw new Error("查询 project_id 失败：未找到任何 projectId");
+      }
+
+      async function resolveProjectId(accessToken, parentSignal) {
+        const errors = [];
+        try { return { project_id: await fetchCompanionProjectId(accessToken, parentSignal), method: "loadCodeAssist" }; }
+        catch (e) { errors.push(e?.message || String(e)); }
+        try { return { project_id: await fetchFirstProjectId(accessToken, parentSignal), method: "cloudresourcemanager" }; }
+        catch (e) { errors.push(e?.message || String(e)); }
+        throw new Error("所有方法均无法获取 project_id：\n" + errors.join("\n"));
+      }
+
+      async function resolveCpaForToolsInput(input, parentSignal) {
+        if (!input?.refresh_token) throw new Error("缺少 refresh_token");
+        if (!input?.email) throw new Error("缺少 email");
+        const cached = state.resolverCache.get(input.refresh_token);
+        if (cached?.access_token && cached?.project_id) {
+          const now = Date.now(), expires_in = cached.expires_in || 3599;
+          return {
+            access_token: cached.access_token, email: input.email, expired: new Date(now + expires_in * 1000).toISOString(),
+            expires_in, refresh_token: input.refresh_token, timestamp: now, type: "antigravity", project_id: cached.project_id, project: cached.project_id
+          };
+        }
+        const token = await oauthRefreshAccessToken(input.refresh_token, parentSignal);
+        const expires_in = token.expires_in > 0 ? Math.floor(token.expires_in) : 3599;
+        const proj = await resolveProjectId(token.access_token, parentSignal);
+        state.resolverCache.set(input.refresh_token, { access_token: token.access_token, expires_in, project_id: proj.project_id, method: proj.method });
+        const now = Date.now();
+        return {
+          access_token: token.access_token, email: input.email, expired: new Date(now + expires_in * 1000).toISOString(),
+          expires_in, refresh_token: input.refresh_token, timestamp: now, type: "antigravity", project_id: proj.project_id, project: proj.project_id
+        };
+      }
+
+      function isAbortError(e) {
+        if (e?.name === "AbortError") return true;
+        return /aborted|abort/i.test(e?.message || String(e || ""));
+      }
+
+      async function startRepairPending() {
+        const pending = state.outputs.filter(o => o.format === FORMAT.CPA && o.status === OUT_STATUS.PENDING);
+        if (!pending.length || state.repairing) return;
+        abortRepairs(); state.repairing = true;
+        const controller = new AbortController(); state.repairAbort = controller; const signal = controller.signal;
+        const total = pending.length; let done = 0, bad = 0;
+        const updateProgress = () => { setStatus("", `自动修复中 ${done}/${total}`); renderAll(); };
+        updateProgress();
+        const concurrency = 3; let index = 0;
+        const workers = new Array(Math.min(concurrency, total)).fill(0).map(async () => {
+          while (index < pending.length) {
+            const current = pending[index++]; if (signal.aborted) return;
+            const input = state.inputs.find(x => x.id === current.meta?.inputId) || null;
+            try { const resolved = await resolveCpaForToolsInput(input, signal); current.obj = resolved; current.status = OUT_STATUS.READY; current.error = ""; }
+            catch (e) { if (isAbortError(e)) return; current.status = OUT_STATUS.ERROR; current.error = e?.message || "修复失败"; bad++; }
+            finally { done++; updateProgress(); }
+          }
+        });
+        try { await Promise.all(workers); if (!signal.aborted) setStatus(bad ? "warn" : "ok", bad ? `已修复（${bad} 条失败）` : "已修复"); }
+        finally { state.repairing = false; state.repairAbort = null; renderAll(); }
+      }
+
+      function bindEvents() {
+        el.pickBtn.addEventListener("click", () => el.fileInput.click());
+        el.dropzone.addEventListener("click", () => el.fileInput.click());
+        el.dropzone.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") el.fileInput.click(); });
+        el.fileInput.addEventListener("change", async () => { await handleFiles(el.fileInput.files); el.fileInput.value = ""; });
+        ["dragenter", "dragover"].forEach(evt => { el.dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); el.dropzone.classList.add("dragover"); }); });
+        ["dragleave", "drop"].forEach(evt => { el.dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); el.dropzone.classList.remove("dragover"); }); });
+        el.dropzone.addEventListener("drop", async (e) => { if (e.dataTransfer) await handleFiles(e.dataTransfer.files); });
+        el.pasteBtn.addEventListener("click", showPasteModal);
+        el.clearBtn.addEventListener("click", clearAll);
+        el.modalCloseBtn.addEventListener("click", closeModal);
+        el.modalBackdrop.addEventListener("click", (ev) => { if (ev.target === el.modalBackdrop) closeModal(); });
+        document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && isModalOpen()) closeModal(); });
+        el.repairNowBtn.addEventListener("click", () => void startRepairPending());
+        el.downloadZipBtn.addEventListener("click", () => void onDownloadZip());
+        document.addEventListener("paste", (ev) => {
+          const tag = String(ev.target?.tagName || "").toLowerCase();
+          if (tag === "input" || tag === "textarea" || isModalOpen()) return;
+          const trimmed = String(ev.clipboardData ? ev.clipboardData.getData("text") : "").trim();
+          if (!trimmed || (trimmed[0] !== "{" && trimmed[0] !== "[")) return;
+          try { addInputs(flattenParsed(JSON.parse(trimmed), "粘贴输入")); setStatus("ok", "已从剪贴板导入"); } catch { }
+        });
+      }
+
+      bindEvents(); renderAll(); setStatus("ok", "就绪");
+    })();
+  </script>
+</body>
+
+</html>
