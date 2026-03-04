@@ -116,7 +116,7 @@
     }
 
     .title::after {
-      content: "DADA_JSON_VOID";
+      content: "DADA_JSON_CPA";
       position: absolute;
       top: 5px;
       left: 5px;
@@ -162,7 +162,7 @@
     }
 
     .dropzone::before {
-      content: "INSERT_HERE";
+      content: "置入此处";
       position: absolute;
       top: -20px;
       right: 10px;
@@ -265,7 +265,7 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1 class="title">ANTIGRAVITY <span>TOOLS</span> ⇄ VOID</h1>
+        <h1 class="title">ANTIGRAVITY <span>TOOLS</span> ⇄ CLIPROXYAPI</h1>
       </div>
     </header>
 
@@ -284,19 +284,19 @@
                 <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2" stroke="var(--neon-blue)"></path>
               </svg>
             </div>
-            <div class="dz-title">FEED_ME_JSON</div>
-            <div class="dz-sub">(CLICK OR DRAG INTO THE VOID)</div>
+            <div class="dz-title">喂食 JSON</div>
+            <div class="dz-sub">(点击或拖入虚空)</div>
             <div class="dz-actions">
-              <button id="pickBtn" class="btn primary" type="button" style="display:none">CHOOSE</button>
-              <button id="pasteBtn" class="btn" type="button" style="display:none">PASTE</button>
+              <button id="pickBtn" class="btn primary" type="button" style="display:none">选择文件</button>
+              <button id="pasteBtn" class="btn" type="button" style="display:none">粘贴</button>
             </div>
           </div>
 
           <div class="meta-row" style="display:none; margin-top: 20px;">
-            <span id="countPill" class="tag">0 FILES</span>
-            <span id="formatPill" class="tag" style="background: var(--neon-pink)">UNKNOWN</span>
-            <button id="clearBtn" class="pixel-btn" style="padding: 5px 10px; font-size: 12px;" type="button">PURGE</button>
-            <span id="statusBadge" class="badge">READY</span>
+            <span id="countPill" class="tag">0 个文件</span>
+            <span id="formatPill" class="tag" style="background: var(--neon-pink)">未知格式</span>
+            <button id="clearBtn" class="pixel-btn" style="padding: 5px 10px; font-size: 12px;" type="button">清空</button>
+            <span id="statusBadge" class="badge">就绪</span>
           </div>
 
           <div id="importNote" class="note" style="display: none"></div>
@@ -306,13 +306,13 @@
       <!-- 结果区：深邃故障感 -->
       <section class="card results-card" aria-label="转换与下载">
         <div class="card-hd" style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="card-title" id="resultsTitle" style="font-family:var(--impact); font-size: 24px;">OUTPUT_STREAM</div>
-          <button id="downloadZipBtn" class="pixel-btn" type="button" disabled>GET_ZIP</button>
+          <div class="card-title" id="resultsTitle" style="font-family:var(--impact); font-size: 24px;">输出流</div>
+          <button id="downloadZipBtn" class="pixel-btn" type="button" disabled>下载压缩包</button>
         </div>
         <div class="card-bd">
           <div id="repairBanner" class="note" style="display: none; border-color: var(--acid-yellow);" role="status">
-            <div class="banner-title">NETWORK_REPAIR_ACTIVE</div>
-            <button id="repairNowBtn" class="btn primary" type="button">RETRY</button>
+            <div class="banner-title">网络自动修复已开启</div>
+            <button id="repairNowBtn" class="btn primary" type="button">重试</button>
           </div>
 
           <div id="outputList" class="list" aria-label="输出文件列表"></div>
@@ -612,10 +612,10 @@
         el.outputList.innerHTML = "";
         if (!state.outputs.length) {
           const empty = document.createElement("div"); empty.className = "note";
-          empty.textContent = "THE_VOID_IS_EMPTY. FEED_ME_JSON.";
+          empty.textContent = "虚空空无一物。请喂食 JSON。";
           el.outputList.appendChild(empty); return;
         }
-        el.resultsTitle.textContent = `OUTPUT_STREAM (${state.outputs.length})`;
+        el.resultsTitle.textContent = `输出流 (${state.outputs.length})`;
         const frag = document.createDocumentFragment();
         state.outputs.forEach((o, idx) => {
           const isExpanded = state.expandedIds.has(o.id);
@@ -643,25 +643,25 @@
           
           const meta = document.createElement("div"); meta.className = "item-meta";
           const fmt = document.createElement("span"); fmt.className = "tag"; fmt.style.background = o.format === FORMAT.CPA ? "var(--neon-blue)" : "var(--neon-pink)";
-          fmt.textContent = o.format === FORMAT.CPA ? "CPA_STREAM" : "TOOLS_DATA";
+          fmt.textContent = o.format === FORMAT.CPA ? "CPA 格式" : "Tools 格式";
           
           const st = document.createElement("span");
           st.className = "tag";
           st.style.background = o.status === OUT_STATUS.READY ? "var(--acid-yellow)" : "white";
           st.style.color = "black";
-          st.textContent = o.status === OUT_STATUS.READY ? "STABLE" : o.status === OUT_STATUS.PENDING ? "REPAIRING..." : "CORRUPTED";
+          st.textContent = o.status === OUT_STATUS.READY ? "稳定" : o.status === OUT_STATUS.PENDING ? "修复中..." : "已损坏";
           
           meta.appendChild(fmt); meta.appendChild(st);
           main.appendChild(title); main.appendChild(meta);
           
           const actions = document.createElement("div"); actions.className = "item-actions";
           const copyBtn = document.createElement("button"); copyBtn.className = "btn"; copyBtn.style.fontSize="10px"; copyBtn.type = "button";
-          copyBtn.textContent = "CLONE";
+          copyBtn.textContent = "复制";
           copyBtn.disabled = o.status !== OUT_STATUS.READY;
           copyBtn.addEventListener("click", (ev) => { ev.stopPropagation(); triggerGlitch(); onCopyItem(o); });
           
           const dl = document.createElement("button"); dl.className = "pixel-btn"; dl.style.padding="4px 8px"; dl.style.fontSize="10px"; dl.type = "button";
-          dl.textContent = "EXTRACT";
+          dl.textContent = "提取";
           dl.disabled = o.status !== OUT_STATUS.READY;
           dl.addEventListener("click", (ev) => { ev.stopPropagation(); triggerGlitch(); downloadOneOutput(o); });
           
@@ -671,7 +671,7 @@
           if (isExpanded) {
             const body = document.createElement("div"); body.className = "item-body";
             const pre = document.createElement("pre"); pre.className = "pre";
-            pre.textContent = o.status === OUT_STATUS.READY ? jsonStringifyPretty(maskSecretsDeep(o.obj)) : o.error || "WAITING_FOR_VOID...";
+            pre.textContent = o.status === OUT_STATUS.READY ? jsonStringifyPretty(maskSecretsDeep(o.obj)) : o.error || "等待虚空响应...";
             body.appendChild(pre); item.appendChild(body);
           }
           frag.appendChild(item);
@@ -934,7 +934,7 @@
           if (tag === "input" || tag === "textarea" || isModalOpen()) return;
           const trimmed = String(ev.clipboardData ? ev.clipboardData.getData("text") : "").trim();
           if (!trimmed || (trimmed[0] !== "{" && trimmed[0] !== "[")) return;
-          try { triggerGlitch(); addInputs(flattenParsed(JSON.parse(trimmed), "粘贴输入")); setStatus("ok", "VOID_CONSUMED_CLIPBOARD"); } catch { }
+          try { triggerGlitch(); addInputs(flattenParsed(JSON.parse(trimmed), "粘贴输入")); setStatus("ok", "虚空已吞噬剪贴板"); } catch { }
         });
       }
 
