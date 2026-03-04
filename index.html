@@ -12,520 +12,251 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-color: #2b2b36;
-      --border-color: #6a6a7e;
-      --text-main: #f0f0f5;
-      --text-muted: #a3a3b5;
-      --title-green: #6bf197;
-      --title-pink: #cc4cee;
-      --btn-bg: #dcd3fc;
-      --btn-text: #2f2545;
-      --btn-light: #ffffff;
-      --btn-dark: #7d60c4;
-      --btn-shadow: inset 2px 2px 0 var(--btn-light), inset -3px -3px 0 var(--btn-dark), 0 4px 8px rgba(0, 0, 0, 0.3);
-      --btn-active: #c5b6f0;
-      --btn-active-shadow: inset 3px 3px 0 var(--btn-dark), inset -2px -2px 0 var(--btn-light), 0 0 0 rgba(0, 0, 0, 0);
-      --ok: #6bf197;
-      --warn: #ffb86c;
-      --bad: #ff5555;
-      --mono: "VT323", "Courier New", Courier, monospace, "SimHei";
-      --sans: "VT323", "SimHei", "Microsoft YaHei", sans-serif;
-      --title-font: "Press Start 2P", "VT323", "SimHei", sans-serif;
+      --bg-color: #1a1a1a;
+      --paper-color: #e0e0d0;
+      --ink-black: #050505;
+      --neon-blue: #00f0ff;
+      --neon-pink: #ff00ff;
+      --acid-yellow: #ccff00;
+      --border-color: #333;
+      --text-main: #eee;
+      --text-muted: #888;
+      --mono: "VT323", "Courier New", monospace;
+      --serif: "Georgia", serif;
+      --impact: "Impact", sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
+    @keyframes glitch-skew {
+      0% { transform: skew(0deg); }
+      20% { transform: skew(2deg); }
+      21% { transform: skew(-30deg); filter: blur(1px); }
+      23% { transform: skew(0deg); }
+      80% { transform: skew(-1deg); }
+      81% { transform: skew(40deg); }
+      83% { transform: skew(0deg); }
     }
 
-    html,
-    body {
-      height: 100%;
+    @keyframes noise {
+      0% { transform: translate(0,0) }
+      10% { transform: translate(-5%,-5%) }
+      20% { transform: translate(-10%,5%) }
+      30% { transform: translate(5%,-10%) }
+      40% { transform: translate(-5%,15%) }
+      50% { transform: translate(-10%,5%) }
+      60% { transform: translate(15%,0) }
+      70% { transform: translate(0,10%) }
+      80% { transform: translate(-15%,0) }
+      90% { transform: translate(10%,5%) }
+      100% { transform: translate(5%,0) }
     }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: var(--sans);
+      font-family: var(--mono);
       color: var(--text-main);
       background-color: var(--bg-color);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      overflow-x: hidden;
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 60px 20px;
+    }
+
+    /* 噪点覆盖层 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 9999;
+      animation: noise 0.5s steps(2) infinite;
     }
 
     .app {
       width: 100%;
-      max-width: 700px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 40px;
+      align-items: start;
     }
 
     .topbar {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 16px;
-    }
-
-    .top-icon {
-      margin-bottom: -10px;
-    }
-
-    .refresh-icon {
-      width: 32px;
-      height: 32px;
-      color: #fff;
-      opacity: 0.9;
-      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-    }
-
-    .brand {
-      min-width: 0;
+      grid-column: 1 / -1;
+      position: relative;
+      margin-bottom: 60px;
+      transform: rotate(-1.5deg);
     }
 
     .title {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      color: var(--title-green);
-      text-shadow: 3px 3px 0 var(--title-pink);
-      font-family: var(--title-font);
+      font-family: var(--impact);
+      font-size: 72px;
       text-transform: uppercase;
-      margin: 10px 0 20px 0;
-      white-space: nowrap;
-    }
-
-    .grid {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .card {
-      width: 100%;
-    }
-
-    .card-hd {
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px dashed var(--border-color);
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
+      line-height: 0.8;
+      margin: 0;
       color: var(--text-main);
+      position: relative;
+      letter-spacing: -2px;
+      mix-blend-mode: difference;
     }
 
-    .card-bd {
-      padding: 20px;
+    /* 文本拉伸效果 */
+    .title span {
+      display: inline-block;
+      transform: scaleX(2.5) translateX(15%);
+      color: var(--acid-yellow);
+      font-family: var(--serif);
+      font-style: italic;
+    }
+
+    .title::after {
+      content: "DADA_JSON_VOID";
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      color: var(--neon-pink);
+      z-index: -1;
+      opacity: 0.7;
+      filter: blur(2px);
+    }
+
+    .grid { display: contents; }
+
+    /* 达达主义卡片 - 撕裂感 */
+    .card {
+      background: var(--paper-color);
+      color: var(--ink-black);
+      padding: 30px;
+      position: relative;
+      box-shadow: 15px 15px 0 var(--ink-black);
+      clip-path: polygon(0% 2%, 98% 0%, 100% 95%, 5% 100%, 0% 80%);
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translate(-5px, -5px) rotate(0.5deg);
+    }
+
+    .results-card {
+      margin-top: 40px;
+      background: var(--ink-black);
+      color: var(--text-main);
+      box-shadow: 20px 20px 0 var(--acid-yellow);
+      clip-path: polygon(2% 0%, 100% 5%, 95% 100%, 0% 98%);
+      transform: rotate(1deg);
     }
 
     .dropzone {
-      border: 2px dashed var(--border-color);
-      border-radius: 12px;
-      padding: 40px 20px;
+      border: 4px solid var(--ink-black);
+      padding: 60px 20px;
       text-align: center;
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.15);
-      transition: background 0.2s, border-color 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
+      cursor: crosshair;
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+      position: relative;
     }
 
-    .dropzone:hover {
-      border-color: var(--title-green);
-      background: rgba(107, 241, 151, 0.05);
-    }
-
-    .dropzone.dragover {
-      border-color: var(--title-pink);
-      background: rgba(204, 76, 238, 0.1);
-    }
-
-    .dz-icon {
-      margin-bottom: 20px;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
-      transition: transform 0.2s;
-    }
-
-    .dropzone:hover .dz-icon {
-      transform: translateY(-4px);
+    .dropzone::before {
+      content: "INSERT_HERE";
+      position: absolute;
+      top: -20px;
+      right: 10px;
+      background: var(--acid-yellow);
+      padding: 2px 10px;
+      font-weight: 900;
+      transform: rotate(5deg);
     }
 
     .dz-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-
-    .dz-sub {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-      opacity: 0.7;
-    }
-
-    .pixel-btn,
-    .btn.primary,
-    .btn.solid-dark {
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: 1px;
+      text-decoration: underline wavy var(--neon-pink);
+    }
+
+    .pixel-btn, .btn.primary {
+      background: var(--ink-black);
+      color: var(--acid-yellow);
+      border: none;
+      padding: 15px 30px;
+      font-family: var(--impact);
+      font-size: 20px;
       cursor: pointer;
-      user-select: none;
-      box-shadow: var(--btn-shadow);
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-
-    .pixel-btn:hover,
-    .btn.primary:hover,
-    .btn.solid-dark:hover {
-      filter: brightness(1.1);
-      transform: translateY(-2px);
-    }
-
-    .pixel-btn:active,
-    .btn.primary:active,
-    .btn.solid-dark:active {
-      background: var(--btn-active);
-      box-shadow: var(--btn-active-shadow);
-      transform: translateY(2px);
-    }
-
-    .pixel-btn:disabled,
-    .btn.primary:disabled,
-    .btn.solid-dark:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      filter: grayscale(1);
-      box-shadow: inset 2px 2px 0 #999, inset -3px -3px 0 #444;
-    }
-
-    .pixel-btn:disabled:active,
-    .btn.primary:disabled:active,
-    .btn.solid-dark:disabled:active {
-      transform: none;
-      box-shadow: inset 2px 2px 0 #999, inset -3px -3px 0 #444;
-    }
-
-    .meta-row {
+      position: relative;
+      box-shadow: 5px 5px 0 var(--neon-blue);
+      text-transform: uppercase;
       margin-top: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
     }
 
-    .pill,
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 8px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
+    .pixel-btn:hover {
+      animation: glitch-skew 0.2s infinite;
+      background: var(--neon-pink);
+      color: white;
     }
 
-    .badge.ok {
-      color: var(--ok);
-      border-color: var(--ok);
-      background: rgba(107, 241, 151, 0.1);
-    }
-
-    .badge.warn {
-      color: var(--warn);
-      border-color: var(--warn);
-      background: rgba(255, 184, 108, 0.1);
-    }
-
-    .badge.bad {
-      color: var(--bad);
-      border-color: var(--bad);
-      background: rgba(255, 85, 85, 0.1);
-    }
-
-    .list {
-      margin-top: 16px;
-      border: 1px dashed var(--border-color);
-      background: rgba(0, 0, 0, 0.15);
-    }
+    .list { margin-top: 30px; }
 
     .item {
-      border-bottom: 1px dashed var(--border-color);
-    }
-
-    .item:last-child {
-      border-bottom: none;
-    }
-
-    .item:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .item.expanded {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--title-green);
-    }
-
-    .item-header {
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      cursor: pointer;
-    }
-
-    .item-main {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .item-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
+      border: 2px solid var(--border-color);
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.03);
+      position: relative;
       overflow: hidden;
     }
 
-    .item-title svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: var(--title-pink);
-      transition: transform 0.2s;
-    }
+    /* 结果项的不对称位移 */
+    .item:nth-child(even) { transform: translateX(10px) rotate(-0.5deg); }
+    .item:nth-child(odd) { transform: translateX(-10px) rotate(0.5deg); }
 
-    .item.expanded .item-title svg {
-      transform: rotate(90deg);
-      color: var(--title-green);
-    }
-
-    .item-meta {
-      margin-top: 8px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .item-header { padding: 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .item-title { font-weight: bold; font-family: var(--serif); font-size: 18px; }
 
     .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 6px;
-      font-size: 11px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-    }
-
-    .tag.dark {
-      background: #000;
-      color: #fff;
-    }
-
-    .item-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn {
-      background: var(--bg-color);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .btn:active {
-      background: #000;
-    }
-
-    .btn.ghost {
-      border-color: transparent;
-      background: transparent;
-    }
-
-    .btn.ghost:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--border-color);
-    }
-
-    .btn.mini {
-      padding: 4px 8px;
-      font-size: 11px;
-    }
-
-    .item-body {
-      padding: 0 20px 20px;
-      display: none;
-    }
-
-    .item.expanded .item-body {
-      display: block;
+      background: var(--neon-blue);
+      color: black;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 900;
+      margin-right: 5px;
     }
 
     .pre {
-      margin: 0;
-      padding: 12px;
       background: #000;
-      color: var(--title-green);
-      border: 1px solid var(--border-color);
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.5;
-      overflow: auto;
-      max-height: 400px;
-    }
-
-    .pre::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    .pre::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .banner {
-      margin-bottom: 24px;
-      padding: 16px;
-      border: 1px solid var(--warn);
-      background: rgba(255, 184, 108, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .banner-title {
-      font-weight: bold;
-      color: var(--warn);
-      font-size: 14px;
-    }
-
-    .banner-sub {
-      margin-top: 4px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .note {
-      margin: 16px 0;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      border-left: 2px solid var(--border-color);
-      font-size: 13px;
-      white-space: pre-wrap;
-    }
-
-    .note.warn {
-      border-color: var(--title-pink);
-      color: #fff;
-    }
-
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: var(--neon-blue);
       padding: 20px;
-      z-index: 50;
+      font-size: 12px;
+      border-top: 1px solid var(--border-color);
+      text-shadow: 0 0 5px var(--neon-blue);
     }
 
+    /* 滚动条故障感 */
+    .pre::-webkit-scrollbar { width: 12px; }
+    .pre::-webkit-scrollbar-thumb { background: var(--acid-yellow); border: 3px solid black; }
+
+    /* 反常规反馈：模态框 */
     .modal {
-      width: min(600px, 92vw);
-      border: 2px solid var(--border-color);
-      background: var(--bg-color);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    }
-
-    .modal-hd {
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px dashed var(--border-color);
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--title-green);
-    }
-
-    .modal-bd {
-      padding: 16px;
+      background: var(--acid-yellow);
+      color: black;
+      border: 10px solid black;
+      transform: rotate(-2deg);
     }
 
     .textarea {
-      width: 100%;
-      min-height: 160px;
-      resize: vertical;
-      padding: 12px;
-      background: #000;
-      border: 1px solid var(--border-color);
-      color: var(--title-green);
-      font-family: var(--mono);
-      font-size: 13px;
+      background: white;
+      color: black;
+      border: 3px solid black;
+      font-weight: bold;
     }
 
-    .textarea:focus {
-      outline: none;
-      border-color: var(--title-pink);
-      box-shadow: 0 0 10px rgba(204, 76, 238, 0.3);
-    }
-
-    .icon-btn {
-      width: 28px;
-      height: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: transparent;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      color: #fff;
-    }
-
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+    .note {
+      border-left: 10px solid var(--neon-pink);
+      padding: 15px;
+      background: rgba(255,0,255,0.1);
+      font-style: italic;
     }
   </style>
 </head>
@@ -533,69 +264,55 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="top-icon">
-        <svg viewBox="0 0 24 24" fill="none" class="refresh-icon" stroke="currentColor" stroke-width="3"
-          stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"></polyline>
-          <polyline points="1 20 1 14 7 14"></polyline>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-        </svg>
-      </div>
       <div class="brand">
-        <div class="title">antigravity tools ⇄ cliproxyapi</div>
+        <h1 class="title">ANTIGRAVITY <span>TOOLS</span> ⇄ VOID</h1>
       </div>
     </header>
 
     <main class="grid">
+      <!-- 导入区：纸片贴纸感 -->
       <section class="card drop-card" aria-label="导入">
         <div class="card-bd">
           <input id="fileInput" type="file" accept=".json,application/json" multiple hidden />
 
-          <div id="dropzone" class="dropzone pixel-dropzone" role="button" tabindex="0" aria-label="拖拽或点击导入 JSON">
+          <div id="dropzone" class="dropzone" role="button" tabindex="0">
             <div class="dz-icon" aria-hidden="true">
-              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 16H24L32 24H56V48H8V16Z" fill="#a890e8" />
-                <path d="M32 24H56V48H32V24Z" fill="#7d60c4" />
-                <path d="M12 28H52V48H12V28Z" fill="#d0bfff" />
-                <rect x="8" y="16" width="16" height="8" fill="#a890e8" />
+              <!-- 超现实并置：使用一只巨大的抽象眼睛代替传统文件夹 -->
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3" fill="var(--neon-pink)"></circle>
+                <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2" stroke="var(--neon-blue)"></path>
               </svg>
             </div>
-            <div class="dz-title">拖拽 JSON 文件到这里</div>
-            <div class="dz-sub">或点击选择文件 (支持批量)</div>
+            <div class="dz-title">FEED_ME_JSON</div>
+            <div class="dz-sub">(CLICK OR DRAG INTO THE VOID)</div>
             <div class="dz-actions">
-              <button id="pickBtn" class="btn primary" type="button" style="display:none">选择文件</button>
-              <button id="pasteBtn" class="btn" type="button" style="display:none">粘贴 JSON</button>
+              <button id="pickBtn" class="btn primary" type="button" style="display:none">CHOOSE</button>
+              <button id="pasteBtn" class="btn" type="button" style="display:none">PASTE</button>
             </div>
           </div>
 
-          <div class="meta-row" style="display:none">
-            <span id="countPill" class="pill">0 个文件</span>
-            <span id="formatPill" class="pill">未解析</span>
-            <button id="clearBtn" class="btn ghost mini" type="button">清空列表</button>
-            <span id="statusBadge" class="badge">就绪</span>
+          <div class="meta-row" style="display:none; margin-top: 20px;">
+            <span id="countPill" class="tag">0 FILES</span>
+            <span id="formatPill" class="tag" style="background: var(--neon-pink)">UNKNOWN</span>
+            <button id="clearBtn" class="pixel-btn" style="padding: 5px 10px; font-size: 12px;" type="button">PURGE</button>
+            <span id="statusBadge" class="badge">READY</span>
           </div>
 
           <div id="importNote" class="note" style="display: none"></div>
         </div>
       </section>
 
+      <!-- 结果区：深邃故障感 -->
       <section class="card results-card" aria-label="转换与下载">
-        <div class="card-hd">
-          <div class="card-title" id="resultsTitle">转换结果</div>
-          <div class="row">
-            <button id="downloadZipBtn" class="pixel-btn" type="button" disabled
-              style="padding: 6px 12px; font-size: 13px;">下载压缩包</button>
-          </div>
+        <div class="card-hd" style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="card-title" id="resultsTitle" style="font-family:var(--impact); font-size: 24px;">OUTPUT_STREAM</div>
+          <button id="downloadZipBtn" class="pixel-btn" type="button" disabled>GET_ZIP</button>
         </div>
         <div class="card-bd">
-          <div id="repairBanner" class="banner" style="display: none" role="status" aria-live="polite">
-            <div class="banner-main">
-              <div class="banner-title">网络自动修复已开启</div>
-              <div class="banner-sub">
-                尝试获取补全所需的数据。
-              </div>
-            </div>
-            <button id="repairNowBtn" class="btn primary" type="button">立刻重试</button>
+          <div id="repairBanner" class="note" style="display: none; border-color: var(--acid-yellow);" role="status">
+            <div class="banner-title">NETWORK_REPAIR_ACTIVE</div>
+            <button id="repairNowBtn" class="btn primary" type="button">RETRY</button>
           </div>
 
           <div id="outputList" class="list" aria-label="输出文件列表"></div>
@@ -895,54 +612,86 @@
         el.outputList.innerHTML = "";
         if (!state.outputs.length) {
           const empty = document.createElement("div"); empty.className = "note";
-          empty.textContent = "暂无输出。请先导入 antigravity tools 或 cliproxyapi 的 JSON。";
+          empty.textContent = "THE_VOID_IS_EMPTY. FEED_ME_JSON.";
           el.outputList.appendChild(empty); return;
         }
-        el.resultsTitle.textContent = `转换结果 (${state.outputs.length} 个文件)`;
+        el.resultsTitle.textContent = `OUTPUT_STREAM (${state.outputs.length})`;
         const frag = document.createDocumentFragment();
         state.outputs.forEach((o, idx) => {
           const isExpanded = state.expandedIds.has(o.id);
           const item = document.createElement("div");
           item.className = "item" + (isExpanded ? " expanded" : "");
-          item.style.setProperty("--delay", String(Math.min(idx * 18, 140)) + "ms");
+          
+          // 随机性注入：每个项都有独特的旋转和位移
+          const randomRot = (Math.random() * 2 - 1).toFixed(2);
+          const randomX = (Math.random() * 10 - 5).toFixed(0);
+          item.style.transform = `rotate(${randomRot}deg) translateX(${randomX}px)`;
+          item.style.zIndex = idx;
+
           const header = document.createElement("div"); header.className = "item-header";
-          header.addEventListener("click", () => { if (state.expandedIds.has(o.id)) state.expandedIds.delete(o.id); else state.expandedIds.add(o.id); renderAll(); });
+          header.addEventListener("click", () => { 
+            // 反常规反馈：点击时触发轻微抖动
+            item.style.animation = "glitch-skew 0.1s 2";
+            setTimeout(() => item.style.animation = "", 200);
+            if (state.expandedIds.has(o.id)) state.expandedIds.delete(o.id); else state.expandedIds.add(o.id); renderAll(); 
+          });
+
           const main = document.createElement("div"); main.className = "item-main";
           const title = document.createElement("div"); title.className = "item-title";
-          const sourceStr = o.source ? `${o.source} &rarr; ` : "";
-          title.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg> ${sourceStr}${o.name}`;
+          const sourceStr = o.source ? `<span style="opacity:0.4; font-size:10px">${o.source} >> </span>` : "";
+          title.innerHTML = `${sourceStr}${o.name}`;
+          
           const meta = document.createElement("div"); meta.className = "item-meta";
-          const fmt = document.createElement("span"); fmt.className = "tag dark"; fmt.textContent = o.format === FORMAT.CPA ? "CPA 格式" : "Tools 格式";
+          const fmt = document.createElement("span"); fmt.className = "tag"; fmt.style.background = o.format === FORMAT.CPA ? "var(--neon-blue)" : "var(--neon-pink)";
+          fmt.textContent = o.format === FORMAT.CPA ? "CPA_STREAM" : "TOOLS_DATA";
+          
           const st = document.createElement("span");
-          const stKind = o.status === OUT_STATUS.READY ? "ok" : o.status === OUT_STATUS.PENDING ? "warn" : "bad";
-          st.className = "badge " + stKind;
-          st.textContent = o.status === OUT_STATUS.READY ? "就绪" : o.status === OUT_STATUS.PENDING ? "等待同步" : "错误";
+          st.className = "tag";
+          st.style.background = o.status === OUT_STATUS.READY ? "var(--acid-yellow)" : "white";
+          st.style.color = "black";
+          st.textContent = o.status === OUT_STATUS.READY ? "STABLE" : o.status === OUT_STATUS.PENDING ? "REPAIRING..." : "CORRUPTED";
+          
           meta.appendChild(fmt); meta.appendChild(st);
-          if (o.format === FORMAT.TOOLS && o.meta?.count != null) { const c = document.createElement("span"); c.className = "tag"; c.textContent = `${o.meta.count} 个账号`; meta.appendChild(c); }
-          if (o.format === FORMAT.CPA && o.meta?.email) { const e = document.createElement("span"); e.className = "tag"; e.textContent = o.meta.email; meta.appendChild(e); }
           main.appendChild(title); main.appendChild(meta);
+          
           const actions = document.createElement("div"); actions.className = "item-actions";
-          const copyBtn = document.createElement("button"); copyBtn.className = "btn ghost mini"; copyBtn.type = "button";
-          copyBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> 复制`;
+          const copyBtn = document.createElement("button"); copyBtn.className = "btn"; copyBtn.style.fontSize="10px"; copyBtn.type = "button";
+          copyBtn.textContent = "CLONE";
           copyBtn.disabled = o.status !== OUT_STATUS.READY;
-          copyBtn.addEventListener("click", (ev) => { ev.stopPropagation(); onCopyItem(o); });
-          const dl = document.createElement("button"); dl.className = "btn mini"; dl.type = "button";
-          dl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 下载`;
+          copyBtn.addEventListener("click", (ev) => { ev.stopPropagation(); triggerGlitch(); onCopyItem(o); });
+          
+          const dl = document.createElement("button"); dl.className = "pixel-btn"; dl.style.padding="4px 8px"; dl.style.fontSize="10px"; dl.type = "button";
+          dl.textContent = "EXTRACT";
           dl.disabled = o.status !== OUT_STATUS.READY;
-          dl.addEventListener("click", (ev) => { ev.stopPropagation(); downloadOneOutput(o); });
+          dl.addEventListener("click", (ev) => { ev.stopPropagation(); triggerGlitch(); downloadOneOutput(o); });
+          
           actions.appendChild(copyBtn); actions.appendChild(dl);
           header.appendChild(main); header.appendChild(actions); item.appendChild(header);
+          
           if (isExpanded) {
             const body = document.createElement("div"); body.className = "item-body";
             const pre = document.createElement("pre"); pre.className = "pre";
-            if (o.status === OUT_STATUS.READY) pre.textContent = jsonStringifyPretty(maskSecretsDeep(o.obj));
-            else if (o.status === OUT_STATUS.PENDING) pre.textContent = "等待自动修复 (联网获取 access_token / project_id)…";
-            else pre.textContent = o.error || "转换失败";
+            pre.textContent = o.status === OUT_STATUS.READY ? jsonStringifyPretty(maskSecretsDeep(o.obj)) : o.error || "WAITING_FOR_VOID...";
             body.appendChild(pre); item.appendChild(body);
           }
           frag.appendChild(item);
         });
         el.outputList.appendChild(frag);
+      }
+
+      function triggerGlitch() {
+        document.body.style.filter = "invert(1) hue-rotate(90deg)";
+        document.body.style.transform = "translateX(5px)";
+        setTimeout(() => {
+          document.body.style.filter = "";
+          document.body.style.transform = "";
+        }, 50);
+      }
+
+      function bindEvents() {
+        // ... (保持原有绑定逻辑)
+        el.downloadZipBtn.addEventListener("click", () => { triggerGlitch(); void onDownloadZip(); });
+        // ... (其他按钮点击也加入 triggerGlitch)
       }
 
       function renderGlobalButtons() {
@@ -1156,27 +905,36 @@
         finally { state.repairing = false; state.repairAbort = null; renderAll(); }
       }
 
+      function triggerGlitch() {
+        document.body.style.filter = "invert(1) hue-rotate(90deg) contrast(2)";
+        document.body.style.transform = `translateX(${(Math.random() * 20 - 10)}px)`;
+        setTimeout(() => {
+          document.body.style.filter = "";
+          document.body.style.transform = "";
+        }, 60);
+      }
+
       function bindEvents() {
-        el.pickBtn.addEventListener("click", () => el.fileInput.click());
-        el.dropzone.addEventListener("click", () => el.fileInput.click());
-        el.dropzone.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") el.fileInput.click(); });
-        el.fileInput.addEventListener("change", async () => { await handleFiles(el.fileInput.files); el.fileInput.value = ""; });
+        el.pickBtn.addEventListener("click", () => { triggerGlitch(); el.fileInput.click(); });
+        el.dropzone.addEventListener("click", () => { triggerGlitch(); el.fileInput.click(); });
+        el.dropzone.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { triggerGlitch(); el.fileInput.click(); } });
+        el.fileInput.addEventListener("change", async () => { triggerGlitch(); await handleFiles(el.fileInput.files); el.fileInput.value = ""; });
         ["dragenter", "dragover"].forEach(evt => { el.dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); el.dropzone.classList.add("dragover"); }); });
         ["dragleave", "drop"].forEach(evt => { el.dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); el.dropzone.classList.remove("dragover"); }); });
-        el.dropzone.addEventListener("drop", async (e) => { if (e.dataTransfer) await handleFiles(e.dataTransfer.files); });
-        el.pasteBtn.addEventListener("click", showPasteModal);
-        el.clearBtn.addEventListener("click", clearAll);
+        el.dropzone.addEventListener("drop", async (e) => { triggerGlitch(); if (e.dataTransfer) await handleFiles(e.dataTransfer.files); });
+        el.pasteBtn.addEventListener("click", () => { triggerGlitch(); showPasteModal(); });
+        el.clearBtn.addEventListener("click", () => { triggerGlitch(); clearAll(); });
         el.modalCloseBtn.addEventListener("click", closeModal);
         el.modalBackdrop.addEventListener("click", (ev) => { if (ev.target === el.modalBackdrop) closeModal(); });
         document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && isModalOpen()) closeModal(); });
-        el.repairNowBtn.addEventListener("click", () => void startRepairPending());
-        el.downloadZipBtn.addEventListener("click", () => void onDownloadZip());
+        el.repairNowBtn.addEventListener("click", () => { triggerGlitch(); void startRepairPending(); });
+        el.downloadZipBtn.addEventListener("click", () => { triggerGlitch(); void onDownloadZip(); });
         document.addEventListener("paste", (ev) => {
           const tag = String(ev.target?.tagName || "").toLowerCase();
           if (tag === "input" || tag === "textarea" || isModalOpen()) return;
           const trimmed = String(ev.clipboardData ? ev.clipboardData.getData("text") : "").trim();
           if (!trimmed || (trimmed[0] !== "{" && trimmed[0] !== "[")) return;
-          try { addInputs(flattenParsed(JSON.parse(trimmed), "粘贴输入")); setStatus("ok", "已从剪贴板导入"); } catch { }
+          try { triggerGlitch(); addInputs(flattenParsed(JSON.parse(trimmed), "粘贴输入")); setStatus("ok", "VOID_CONSUMED_CLIPBOARD"); } catch { }
         });
       }
 
